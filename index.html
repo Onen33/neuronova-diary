@@ -56,7 +56,8 @@
   <div class="diary-container" id="diaryContainer">
     <h1>🌿 Wani's Calm Diary</h1>
     <input type="text" id="title" placeholder="Title" />
-    <input type="text" id="mood" placeholder="Mood e.g., Peaceful, Grateful, Contemplative" />
+    <input type="text" id="mood" placeholder="Mood e.g., Grateful, Overwhelmed" />
+    <input type="text" id="tag" placeholder="Tag e.g., #MamaMode, #DramaSikit" />
     <textarea id="content" rows="6" placeholder="Dear Diary..."></textarea>
     <button onclick="saveEntry()">Save Entry</button>
     <div id="entries"></div>
@@ -75,10 +76,22 @@
       }
     };
 
+    function formatTimestamp() {
+      const now = new Date();
+      const options = {
+        weekday: 'long',
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', hour12: true
+      };
+      return now.toLocaleString('en-SG', options);
+    }
+
     function saveEntry() {
       const title = document.getElementById("title").value;
       const mood = document.getElementById("mood").value;
+      const tag = document.getElementById("tag").value;
       const content = document.getElementById("content").value;
+      const timestamp = formatTimestamp();
 
       if (!title || !content) {
         alert("Please fill in both title and content.");
@@ -91,12 +104,13 @@
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ title, mood, content })
+        body: JSON.stringify({ title, mood, tag, content, timestamp })
       })
       .then(() => {
-        alert("Your diary entry has been saved ✨");
+        alert("📅 Entry saved at " + timestamp);
         document.getElementById("title").value = "";
         document.getElementById("mood").value = "";
+        document.getElementById("tag").value = "";
         document.getElementById("content").value = "";
       })
       .catch((error) => {
