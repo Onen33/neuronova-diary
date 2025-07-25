@@ -2,122 +2,119 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Wani's Calm Diary</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>WaniSpark's Diary</title>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f5f3ed;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      font-family: Arial, sans-serif;
+      background-color: #fffafc;
       padding: 2rem;
-    }
-    .diary-container {
-      background: #ffffff;
-      padding: 2rem;
-      border-radius: 1rem;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
       max-width: 600px;
-      width: 100%;
-      display: none;
+      margin: auto;
     }
+
     h1 {
       text-align: center;
-      color: #556b2f;
+      color: #e91e63;
     }
-    input, textarea {
+
+    input, select, textarea, button {
       width: 100%;
-      padding: 0.75rem;
-      margin-bottom: 1rem;
-      border-radius: 0.5rem;
-      border: 1px solid #ccc;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 6px;
+      border: 1px solid #ddd;
       font-size: 1rem;
     }
+
     button {
-      background-color: #a5a58d;
+      background-color: #e91e63;
       color: white;
-      border: none;
-      padding: 0.75rem 1.5rem;
-      border-radius: 0.5rem;
-      font-size: 1rem;
+      font-weight: bold;
       cursor: pointer;
     }
-    .entry {
-      background: #fefcfb;
-      border-left: 4px solid #a5a58d;
-      padding: 1rem;
+
+    button:hover {
+      background-color: #c2185b;
+    }
+
+    .status {
       margin-top: 1rem;
-      border-radius: 0.5rem;
+      font-style: italic;
     }
   </style>
 </head>
 <body>
-  <div class="diary-container" id="diaryContainer">
-    <h1>🌿 Wani's Calm Diary</h1>
-    <input type="text" id="title" placeholder="Title" />
-    <input type="text" id="mood" placeholder="Mood e.g., Grateful, Overwhelmed" />
-    <input type="text" id="tag" placeholder="Tag e.g., #MamaMode, #DramaSikit" />
-    <textarea id="content" rows="6" placeholder="Dear Diary..."></textarea>
-    <button onclick="saveEntry()">Save Entry</button>
-    <div id="entries"></div>
-  </div>
+
+  <h1>🧚‍♀️ WaniSpark's Private Diary</h1>
+
+  <input type="text" id="title" placeholder="Title (e.g. Migraine Madness)">
+  <input type="text" id="mood" placeholder="Mood (e.g. Tired, Happy)">
+  <input type="text" id="tag" placeholder="Tag (e.g. Parenting, Drama)">
+  <textarea id="content" placeholder="Write your juicy thoughts here..." rows="8"></textarea>
+  <input type="password" id="password" placeholder="Enter your password to save" />
+
+  <button onclick="saveEntry()">Save Entry</button>
+
+  <div class="status" id="status"></div>
 
   <script>
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzC9uMnZpqdXoN09PnVwkKyPB7CP5m6u36w-mdloo-D4851fNg4GVng6aP39IZF5l1Qgg/exec";
-    const diaryPassword = "WaniSparks2104";
+    async function saveEntry() {
+      const title = document.getElementById("title").value.trim();
+      const mood = document.getElementById("mood").value.trim();
+      const tag = document.getElementById("tag").value.trim();
+      const content = document.getElementById("content").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const status = document.getElementById("status");
 
-    window.onload = function () {
-      const entered = prompt("🔐 This diary is private. Please enter the password:");
-      if (entered === diaryPassword) {
-        document.getElementById("diaryContainer").style.display = "block";
-      } else {
-        document.body.innerHTML = '<h2 style="color:#b22222;text-align:center;margin-top:20%">🚫 Access Denied. Nice try, but this diary is for Wani only.</h2>';
-      }
-    };
+      const correctPassword = "WaniSparks2104";
 
-    function formatTimestamp() {
-      const now = new Date();
-      const options = {
-        weekday: 'long',
-        year: 'numeric', month: '2-digit', day: '2-digit',
-        hour: '2-digit', minute: '2-digit', hour12: true
-      };
-      return now.toLocaleString('en-SG', options);
-    }
-
-    function saveEntry() {
-      const title = document.getElementById("title").value;
-      const mood = document.getElementById("mood").value;
-      const tag = document.getElementById("tag").value;
-      const content = document.getElementById("content").value;
-      const timestamp = formatTimestamp();
-
-      if (!title || !content) {
-        alert("Please fill in both title and content.");
+      if (password !== correctPassword) {
+        status.innerText = "❌ Wrong password, cannot save.";
         return;
       }
 
-      fetch(GOOGLE_SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ title, mood, tag, content, timestamp })
-      })
-      .then(() => {
-        alert("📅 Entry saved at " + timestamp);
+      if (!title || !content) {
+        status.innerText = "Please fill in at least the title and content!";
+        return;
+      }
+
+      const data = {
+        title,
+        mood,
+        tag,
+        content
+      };
+
+      try {
+        const response = await fetch("https://script.google.com/macros/s/AKfycbwGS1Vf3q3pKHG6AgPvWc0xBvUeXc3b5jelETdb-xtzdcwmaIbtyufC2Bd21aeaHT2KOg/exec", {
+          method: "POST",
+          mode: "no-cors", // Required by Google Scripts
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(data)
+        });
+
+        const now = new Date();
+        const day = now.toLocaleDateString("en-SG", { weekday: 'long' });
+        const time = now.toLocaleTimeString("en-SG", { hour: '2-digit', minute: '2-digit' });
+
+        status.innerText = `✅ Entry saved at ${day}, ${time}!`;
+
+        // Optional: Clear input fields
         document.getElementById("title").value = "";
         document.getElementById("mood").value = "";
         document.getElementById("tag").value = "";
         document.getElementById("content").value = "";
-      })
-      .catch((error) => {
-        alert("Oops! Something went wrong.");
-        console.error("Error:", error);
-      });
+        document.getElementById("password").value = "";
+
+      } catch (error) {
+        console.error("Save failed:", error);
+        status.innerText = "❌ Failed to save. Try again.";
+      }
     }
   </script>
+
 </body>
 </html>
